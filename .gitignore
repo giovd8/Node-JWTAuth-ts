@@ -1,0 +1,17 @@
+/node_modules
+temp
+onboardings
+.env
+images
+cafiles
+video
+audio
+reports
+logs
+dist
+build
+liveness
+speech2text
+voiceid
+package-lock.json
+templates/amlReport/reports/
