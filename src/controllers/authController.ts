@@ -31,7 +31,7 @@ export class AuthController {
     // const hashedPassword = bcrypt.hashSync(req.body.password, 10);
     try {
       await User.create({
-        username: req.body.usernam,
+        username: req.body.username,
         password: req.body.password,
         role: "user"
       });
@@ -45,27 +45,23 @@ export class AuthController {
   }
 
   async loginUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-
-    const user = await User.findOne({
-      username: req.body.username
-    });
-
-    if (!user) {
-      res.status(401).send(
-        { message: 'Invalid username or password.' }
-      );
-      return
+    try {
+      const user = await User.findOne({
+        username: req.body.username
+      });
+      if (!user) {
+        throw ({ message: 'Invalid username or password.' });
+      }
+      const isMatch = bcrypt.compareSync(req.body.password, user!.password);
+      if (!isMatch) {
+        throw ({ message: 'Invalid username or password.' });
+      }
+      const token = AuthController.generateAccessToken(req.body.username);
+      res.status(200).send({ token: token });
     }
-    const isMatch = bcrypt.compareSync(req.body.password, user!.password);
-    if (!isMatch) {
-      res.status(401).send(
-        { message: 'Invalid username or password.' }
-      );
-      return
+    catch (err: any) {
+      next(err);
     }
-    const token = AuthController.generateAccessToken(req.body.username);
-    res.status(200).send({ token: token });
-
   }
 
   // loginUser(req: Request, res: Response, next: NextFunction) {
